@@ -102,8 +102,11 @@ predIngCat2019 = pd.DataFrame(predIngCat2019RN,columns = prediccionVentas2019Cat
 #ingresos por categoría 5 años
 IngCatFinal = pd.concat([df_resultadoIng2, predIngCat2019], axis=0)
 VentCatFinal = pd.concat([df_resultadoVent2[["Technology","Office Supplies","Furniture"]], prediccionVentas2019Cat], axis=0)
-IngFinal = pd.concat([df_resultadoIng, dfy_predSE2019])
-VentFinal = pd.concat([df_resultadoVent, X_predRL2019])
+IngTotFinal = pd.concat([df_resultadoIng, dfy_predSE2019])
+VentTotFinal = pd.concat([df_resultadoVent, X_predRL2019])
+IngCatFinal["Total"] = IngTotFinal
+VentCatFinal["Total"] = VentTotFinal
+
 
 # Título de la aplicación
 st.title("Clasificación de ventas según criterio ABC")
@@ -119,69 +122,70 @@ Pretende priorizar las mercancías de un almacén más importantes
 
 # Mostrar los DataFrames
 colMes1, colMes2 = st.columns(2)
-
+meses_disponibles = ['Todos'] + list(np.unique(VentCatFinal.index.month))
+meses_disponiblesI = ['Todos'] + list(np.unique(IngCatFinal.index.month))
 # Mostrar los gráficos en las columnas
 with colMes1:
     st.write("Ventas")
-
+    mes_seleccionado = st.selectbox("Mes Venta", meses_disponibles)
 with colMes2:
     st.write("Ingresos")
-    #st.pyplot(fig2)
-# Filtro por valor mínimo de ventas
-min_sales = st.slider("Filtrar por ventas mínimas", min_value=0, max_value=400, value=0)
-min_amount = st.slider("Filtrar por importe mínimo", min_value=0, max_value=50000, value=0)
-#min_amount = st.slider("Filtrar por importe mínimo", min_value=0, max_value=50000, value=0)
-# Aplicar el filtro
-df_filtered = VentCatFinal[VentCatFinal >= min_sales].dropna()
-df_filteredI = IngCatFinal[IngCatFinal >= min_amount].dropna()
-#df_filtered2 = df_filtered[df_filtered>= min_sales].dropna()
-meses_disponibles = ['Todos'] + list(np.unique(df_filtered.index.month))
-meses_disponiblesI = ['Todos'] + list(np.unique(df_filteredI.index.month))
-colMes1, colMes2 = st.columns(2)
-
-with colMes1:
-    mes_seleccionado = st.selectbox("Mes Venta", meses_disponibles)
-
-with colMes2:
     mes_seleccionadoI = st.selectbox("Mes Ingreso", meses_disponiblesI)
-
 #para filtras por meses las ventas
 if mes_seleccionado != 'Todos':
-    df_filtered2 = df_filtered[df_filtered.index.month == mes_seleccionado]
+    df_filtered = VentCatFinal[VentCatFinal.index.month == mes_seleccionado]
 else:
-    df_filtered2 = df_filtered
+    df_filtered = VentCatFinal
 #para filtrar por meses los ingresos
 if mes_seleccionadoI != 'Todos':
-    df_filteredI2 = df_filteredI[df_filteredI.index.month == mes_seleccionadoI]
+    df_filteredI = IngCatFinal[IngCatFinal.index.month == mes_seleccionadoI]
 else:
-    df_filteredI2 = df_filteredI
+    df_filteredI = IngCatFinal
 
-años_disponibles = ['Todos'] + list(np.unique(df_filtered2.index.year))
-años_disponiblesI = ['Todos'] + list(np.unique(df_filteredI2.index.year))
-colY1, colY2 = st.columns(2)
+#a continuación, filtramos por el año
+años_disponibles = ['Todos'] + list(np.unique(df_filtered.index.year))
+años_disponiblesI = ['Todos'] + list(np.unique(df_filteredI.index.year))
 
-with colY1:
+with colMes1: #reutilizamos las columnas anteriores
     año_seleccionado = st.selectbox("Año Venta", años_disponibles)
 
-with colY2:
+with colMes2: #reutilizamos las columnas anteriores
     año_seleccionadoI = st.selectbox("Año Ingreso", años_disponiblesI)
 #filtrar por años las ventas
 if año_seleccionado != 'Todos':
-    df_filtered3 = df_filtered2[df_filtered2.index.year == año_seleccionado]
+    df_filtered2 = df_filtered[df_filtered.index.year == año_seleccionado]
 else:
-    df_filtered3 = df_filtered2
+    df_filtered2 = df_filtered
 #para filtrar por meses los ingresos
 if año_seleccionadoI != 'Todos':
-    df_filteredI3 = df_filteredI2[df_filteredI2.index.year == año_seleccionadoI]
+    df_filteredI2 = df_filteredI[df_filteredI.index.year == año_seleccionadoI]
 else:
-    df_filteredI3 = df_filteredI2
+    df_filteredI2 = df_filteredI
+
+
+# Filtro por valor mínimo de ventas
+min_sales = st.slider("Filtrar por ventas mínimas", min_value=(df_filtered2["Total"].min()+1), max_value=(df_filtered2["Total"].max()-1), value=df_filtered2["Total"].min())
+df_filtered3 = df_filtered2[df_filtered2["Total"] >= min_sales].dropna()
+# Filtro por valor máximo de ventas
+max_sales = st.slider("Filtrar por ventas máximas", min_value=(df_filtered3["Total"].min()+1), max_value=(df_filtered3["Total"].max()-1), value=df_filtered3["Total"].max())
+df_filtered4 = df_filtered3[df_filtered3["Total"] <= max_sales].dropna()
+# Filtro por valor mínimo de ingresos
+min_amount = st.slider("Filtrar por importe mínimo", min_value=(df_filteredI2["Total"].min()+1), max_value=(df_filteredI2["Total"].max()-1), value=df_filteredI2["Total"].min())
+df_filteredI3 = df_filteredI2[df_filteredI2["Total"] >= min_amount].dropna()
+# Filtro por valor máximo de ingresos
+max_amount = st.slider("Filtrar por importe máximo", min_value=(df_filteredI3["Total"].min()+1), max_value=(df_filteredI3["Total"].max()-1), value=df_filteredI3["Total"].max())
+df_filteredI4 = df_filteredI3[df_filteredI3["Total"] <= max_amount].dropna()
+
+# Aplicar el filtro
+
+
 
 st.header("Ventas por categoría")
-st.dataframe(df_filtered3)
+st.dataframe(df_filtered4[["Technology","Office Supplies","Furniture"]])
 
 
 st.header("Ingresos por categoría")
-st.dataframe(df_filteredI3)
+st.dataframe(df_filteredI4[["Technology","Office Supplies","Furniture"]])
 # Mostrar el DataFrame resultante
 
 
@@ -193,21 +197,20 @@ st.dataframe(df_filteredI3)
 
 
 # Grafico de barras
-st.bar_chart(df_filtered3)
-st.bar_chart(df_filteredI3)
+st.bar_chart(df_filtered4[["Technology","Office Supplies","Furniture"]])
+st.bar_chart(df_filteredI4[["Technology","Office Supplies","Furniture"]])
 
 #gráfico circular
 colors = ['lightblue', 'green', 'red']
-mediaVentasCat = df_filtered3.mean().to_numpy()
+mediaVentasCat = df_filtered4[["Technology","Office Supplies","Furniture"]].mean().to_numpy()
 fig1, ax = plt.subplots()
-ax.pie(mediaVentasCat, labels=VentCatFinal.columns, colors = colors,
-       autopct='%1.1f%%', startangle=140)
-
+ax.pie(mediaVentasCat, labels=df_resultadoIng2.columns, colors = colors,autopct='%1.1f%%', startangle=140)
 ax.axis('equal')  # Para asegurar que el gráfico sea un círculo
 
-mediaIngCat = df_filteredI3.mean().to_numpy()
+#segunda figura
+mediaIngCat = df_filteredI4[["Technology","Office Supplies","Furniture"]].mean().to_numpy()
 fig2, ax2 = plt.subplots()
-ax2.pie(mediaIngCat, labels=IngCatFinal.columns, colors = colors,
+ax2.pie(mediaIngCat, labels=df_resultadoIng2.columns, colors = colors,
       autopct='%1.1f%%', startangle=140)
 
 ax2.axis('equal')  # Para asegurar que el gráfico sea un círculo
@@ -225,6 +228,6 @@ with col2:
 
 ###añadir gráfico de columnas de los 5 años. 
 st.write("Ventas totales")
-st.line_chart(VentFinal)
+st.line_chart(df_filtered2[["Total"]])
 st.write("Ingresos totales")
-st.line_chart(IngFinal)
+st.line_chart(df_filteredI2[["Total"]])
