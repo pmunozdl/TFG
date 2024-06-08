@@ -17,7 +17,8 @@ import pandas as pd
 from statsmodels.tsa.api import ExponentialSmoothing #suavizado exponencial triple, que tiene en cuenta la estacionalidad
 
 #leemos el fichero original
-df = pd.read_excel("/Users/pablomunozdelorenzo/Desktop/ventasEcommerce.xlsx")
+#df = pd.read_excel("/Users/pablomunozdelorenzo/Desktop/ventasEcommerce.xlsx")
+df = pd.read_excel("dataset/ventasEcommerce.xlsx")
 df["Order_Date"] = (pd.to_datetime(df["Order_Date"]))
 df["Order_Date"] = df["Order_Date"].dt.normalize() 
 df2 = df[["Order_Date","Total"]]
