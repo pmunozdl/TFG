@@ -81,11 +81,11 @@ IngCatFinal = pd.concat([df_resultadoIng2, predIngCat2019], axis=0)
 VentCatFinal = pd.concat([df_resultadoVent2[["Technology","Office Supplies","Furniture"]], prediccionVentas2019Cat], axis=0)
 IngTotFinal = pd.concat([df_resultadoIng, dfy_predSE2019])
 VentTotFinal = pd.concat([df_resultadoVent, X_predRL2019])
-dataset[VentasTotales] = VentTotFinal
-dataset[VentasTecnologia] = VentCatFinal[["Technology"]]
-dataset[VentasMaterialOficina] = VentCatFinal[["Office Supplies"]]
-dataset[VentasHerramientas] = VentCatFinal[["Furniture"]]
-dataset[IngresosTotales] = IngTotFinal
-dataset[IngresosTecnologia] = IngCatFinal[["Technology"]]
-dataset[IngresosMaterialOficina] = IngCatFinal[["Office Supplies"]]
-dataset[IngresosHerramientas] = IngCatFinal[["Furniture"]]
+dataset[VentasTotales] = VentTotFinal.values
+dataset[VentasTecnologia] = VentCatFinal[["Technology"]].values
+dataset[VentasMaterialOficina] = VentCatFinal[["Office Supplies"]].values
+dataset[VentasHerramientas] = VentCatFinal[["Furniture"]].values
+dataset[IngresosTotales] = IngTotFinal.values
+dataset[IngresosTecnologia] = IngCatFinal[["Technology"]].values
+dataset[IngresosMaterialOficina] = IngCatFinal[["Office Supplies"]].values
+dataset[IngresosHerramientas] = IngCatFinal[["Furniture"]].values
