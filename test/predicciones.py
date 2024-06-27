@@ -6,7 +6,6 @@ from sklearn.linear_model import LinearRegression
 from sklearn import datasets, linear_model
 from keras.src.models.sequential import Sequential
 from keras.src.layers import Dense
-import matplotlib.pyplot as plt
 import pandas as pd
 from statsmodels.tsa.api import ExponentialSmoothing #suavizado exponencial triple, que tiene en cuenta la estacionalidad
 import warnings
@@ -128,6 +127,12 @@ def UnidadesCategoria():
 
 def leerExcel ():
       return df
+
+def pedidos ():
+    ventas_por_pedido = df.groupby('Order_ID')['Total'].sum().reset_index()
+    primer_nombre_cliente = df.groupby('Order_ID')['Customer_ID'].first().reset_index()
+    pedidos = pd.merge(ventas_por_pedido, primer_nombre_cliente, on='Order_ID')
+    return pedidos
 #Ventas totales durante los 5 años
 #VentTotFinal = pd.concat([df_resultadoVent, dfy_predSE2019])
 #Unidades vendidas totales 
