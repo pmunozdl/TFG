@@ -1,9 +1,11 @@
 import numpy as np
+import streamlit as st
 #escalas
 from sklearn.preprocessing import StandardScaler
 #algoritmos 
 from sklearn.linear_model import LinearRegression
 from sklearn import datasets, linear_model
+import keras
 from keras.src.models.sequential import Sequential
 from keras.src.layers import Dense
 import pandas as pd
@@ -54,9 +56,9 @@ df_resultadoUni2 = df_resultadoUni2.unstack(level=0)
 df_resultadoUni2['Total'] = df3.resample('M', on='Order_Date')['Total'].count()
 df_resultadoUni2 = pd.DataFrame(df_resultadoUni2.values, columns = df_resultadoUni2.columns, index = df_resultadoUni2.index.values) #unidades vendidas por categoría 2015-2018
 #calculamos el porcentaje de unidades vendidas por categoría
-PorcentajeTecnología = df_resultadoUni2["Technology"] / df_resultadoUni2["Total"]
-PorcentajeOfficeSupplies = df_resultadoUni2["Office Supplies"] / df_resultadoUni2["Total"]
-PorcentajeFurniture = df_resultadoUni2["Furniture"] / df_resultadoUni2["Total"]
+PorcentajeTecnología = round(df_resultadoUni2["Technology"] / df_resultadoUni2["Total"],3)
+PorcentajeOfficeSupplies = round(df_resultadoUni2["Office Supplies"] / df_resultadoUni2["Total"],3)
+PorcentajeFurniture = round(df_resultadoUni2["Furniture"] / df_resultadoUni2["Total"],3)
 array_concatenado = np.column_stack((PorcentajeTecnología,PorcentajeOfficeSupplies,PorcentajeFurniture))
 pdArray_concatenado = pd.DataFrame(array_concatenado,index=df_resultadoUni2.index.values,columns=["Technology","Office Supplies","Furniture"])
 #preparamos los datos
@@ -71,6 +73,7 @@ X_predRLCatEsc = regr.predict(X_predRLEsc2019) #porcentajes por categoría 2019
 #una vez tenemos los porcentajes, y las ventas totales, ponderamos para saber el valor exacto
 X_predRLCat = scalerUniCat.inverse_transform(X_predRLCatEsc)
 X_predRLCat = pd.DataFrame(X_predRLCat,index = y_predSE2019.index,columns = pdArray_concatenado.columns)
+X_predRLCat = X_predRLCat.round(3)
 prediccionUnidades2019Cat = np.round(X_predRL2019.values * X_predRLCat.values)
 prediccionUnidades2019Cat = pd.DataFrame(prediccionUnidades2019Cat,index = y_predSE2019.index, columns = pdArray_concatenado.columns)
 #Una vez tenemos las unidades vendidas por categoría de 2019, calculamos las ventas por categoría de 2019
@@ -82,9 +85,9 @@ df_resultadoVent2.columns = df_resultadoVent2.columns.droplevel(0)
 df_resultadoVent2 = df_resultadoVent2[["Technology","Office Supplies","Furniture"]]
 df_resultadoVent2["Total"] = df_resultadoVent
 #calculamos porcentajes
-PorcentajeTecnología2 = df_resultadoVent2["Technology"] / df_resultadoVent2["Total"]
-PorcentajeOfficeSupplies2 = df_resultadoVent2["Office Supplies"] / df_resultadoVent2["Total"]
-PorcentajeFurniture2 = df_resultadoVent2["Furniture"] / df_resultadoVent2["Total"]
+PorcentajeTecnología2 = round(df_resultadoVent2["Technology"] / df_resultadoVent2["Total"],4)
+PorcentajeOfficeSupplies2 = round(df_resultadoVent2["Office Supplies"] / df_resultadoVent2["Total"],4)
+PorcentajeFurniture2 = round(df_resultadoVent2["Furniture"] / df_resultadoVent2["Total"],4)
 #calcular a partir del porcentaje y luego ponderar
 array_concatenado2 = np.column_stack((PorcentajeTecnología2,PorcentajeOfficeSupplies2,PorcentajeFurniture2))
 pdArray_concatenado2 = pd.DataFrame(array_concatenado2,index=df_resultadoVent2.index.values,columns=["Technology","Office Supplies","Furniture"])
@@ -100,14 +103,18 @@ UniCatTrainEsc = scalerUniCat2.fit_transform(UniCatTrain)
 UniCatTestEsc =  scalerUniCat2.transform(UniCatTest)
 pdArray_concatenado2TrainEsc = scalerVentCat.fit_transform(pdArray_concatenado2Train)
 #predecimos los ingresos por categoría de 2019
-modelRNVentCat2019 = Sequential()
-modelRNVentCat2019.add(Dense(64, input_shape=(3,), activation='relu'))  # Capa oculta con 64 neuronas, tres entradas y función de activación ReLU
-modelRNVentCat2019.add(Dense(3))  # Capa de salida con una neurona (predicción de ingresos)
-modelRNVentCat2019.compile(optimizer='adam', loss='mse', metrics=['accuracy']) 
-modelRNVentCat2019.fit(UniCatTrainEsc, pdArray_concatenado2TrainEsc, epochs=100, batch_size=32, verbose = 0)
-predVentCat2019RNEsc = modelRNVentCat2019.predict(UniCatTestEsc,verbose=0)
-predVentCat2019RN = scalerVentCat.inverse_transform(predVentCat2019RNEsc)
+keras.utils.set_random_seed(1)
+def prediccionVentasCat():
+    modelRNVentCat2019 = Sequential()
+    modelRNVentCat2019.add(Dense(64, input_shape=(3,), activation='relu'))  # Capa oculta con 64 neuronas, tres entradas y función de activación ReLU
+    modelRNVentCat2019.add(Dense(3))  # Capa de salida con una neurona (predicción de ingresos)
+    modelRNVentCat2019.compile(optimizer='adam', loss='mse', metrics=['accuracy']) 
+    modelRNVentCat2019.fit(UniCatTrainEsc, pdArray_concatenado2TrainEsc, epochs=100, batch_size=32, verbose = 0)
+    predVentCat2019RNEsc = modelRNVentCat2019.predict(UniCatTestEsc,verbose=0)
+    return predVentCat2019RNEsc
+predVentCat2019RN = scalerVentCat.inverse_transform(prediccionVentasCat())
 predVentCat2019RN = pd.DataFrame(predVentCat2019RN,columns=X_predRLCat.columns, index = X_predRLCat.index.values)
+predVentCat2019RN = predVentCat2019RN
 #una vez tenemos los porcentajes predichos, los multiplicamos por los ingresos de 2019 para desglosar los ingresos por categoría
 predVentCat2019 = np.round(dfy_predSE2019.values * predVentCat2019RN.values)
 predVentCat2019 = pd.DataFrame(predVentCat2019,columns = prediccionUnidades2019Cat.columns, index = prediccionUnidades2019Cat.index.values)
