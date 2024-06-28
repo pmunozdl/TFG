@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 
 
-from predicciones import VentasCategoria, UnidadesCategoria, leerExcel, pedidos
+from predicciones import VentasCategoria, UnidadesCategoria, leerExcel, Pedidos
 habitantes = 334835249 #suma poblaciones todos los estados
 class TestPredicciones(unittest.TestCase):
     def test_ventasAnualesTotales(self): #TC1
@@ -187,11 +187,11 @@ class TestPredicciones(unittest.TestCase):
         self.assertEqual(ratio,ratio2)
     
     def test_PorcentajeClientesRepiten(self): 
-        pedidos = pedidos()
-        pedidosClientes = pedidos.groupby('Customer_ID').size()
+        df = Pedidos()
+        pedidosClientes = df.groupby('Customer_ID').size()
         clientesRepetidos = pedidosClientes[pedidosClientes > 1]
         clientesRepetidos = len(clientesRepetidos)
-        clientesTotales = pedidos["Customer_ID"].nunique()
+        clientesTotales = df["Customer_ID"].nunique()
         porcentaje = round((clientesRepetidos/clientesTotales)*100,2)
         self.assertEqual(porcentaje,round((780/793)*100,2))
     

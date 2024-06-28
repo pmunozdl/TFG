@@ -128,7 +128,7 @@ def UnidadesCategoria():
 def leerExcel ():
       return df
 
-def pedidos ():
+def Pedidos ():
     ventas_por_pedido = df.groupby('Order_ID')['Total'].sum().reset_index()
     primer_nombre_cliente = df.groupby('Order_ID')['Customer_ID'].first().reset_index()
     pedidos = pd.merge(ventas_por_pedido, primer_nombre_cliente, on='Order_ID')
