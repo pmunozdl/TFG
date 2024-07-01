@@ -50,9 +50,9 @@ X_predRL2019 = np.round(scalerUni.inverse_transform(X_predRLEsc2019))
 X_predRL2019 = pd.DataFrame(X_predRL2019,index = y_predSE2019.index, columns=["Total"])#predicciones unidades vendidas 2019
 # una vez tenemos las unidades vendidas de 2019, calculamos las unidades vendidas desglosadas por categoría. Primero transformamos los datos
 df3 = df[["Order_Date","Total","Category"]].copy()
-df3['Technology'] = (df3['Category'] == 'Technology').astype(int)
-df3['Office Supplies'] = (df3['Category'] == 'Office Supplies').astype(int)
-df3['Furniture'] = (df3['Category'] == 'Furniture').astype(int)
+df3['Technology'] = round((df3['Category'] == 'Technology').astype(int),3)
+df3['Office Supplies'] = round((df3['Category'] == 'Office Supplies').astype(int),3)
+df3['Furniture'] = round((df3['Category'] == 'Furniture').astype(int),3)
 df3['Order_Date'] = pd.to_datetime(df3['Order_Date'])
 df_resultadoVent2 = df_resultadoVent #ventas 2015-2018
 df_resultadoUni2 = df3.groupby('Category').resample('M', on='Order_Date').size()
@@ -77,6 +77,7 @@ X_predRLCatEsc = regr.predict(X_predRLEsc2019) #porcentajes por categoría 2019
 #una vez tenemos los porcentajes, y las ventas totales, ponderamos para saber el valor exacto
 X_predRLCat = scalerUniCat.inverse_transform(X_predRLCatEsc)
 X_predRLCat = pd.DataFrame(X_predRLCat,index = y_predSE2019.index,columns = pdArray_concatenado.columns)
+X_predRLCat = X_predRLCat.round(3)
 prediccionUnidades2019Cat = np.round(X_predRL2019.values * X_predRLCat.values)
 prediccionUnidades2019Cat = pd.DataFrame(prediccionUnidades2019Cat,index = y_predSE2019.index, columns = pdArray_concatenado.columns)
 #Una vez tenemos las unidades vendidas por categoría de 2019, calculamos las ventas por categoría de 2019
@@ -229,13 +230,13 @@ st.bar_chart(df_filteredI4[["Technology","Office Supplies","Furniture"]])
 
 mediaUnidadesCat = df_filtered4[["Technology","Office Supplies","Furniture"]].mean().to_numpy()
 fig1, ax = plt.subplots()
-ax.pie(mediaUnidadesCat, labels=["Technology","Office Supplies","Furniture"], colors = colors,autopct='%1.1f%%', startangle=140,textprops={'color':"white"})
+ax.pie(mediaUnidadesCat, labels=["Technology","Office Supplies","Furniture"], colors = colors,autopct='%1.2f%%', startangle=140,textprops={'color':"white"})
 ax.axis('equal')  # Para asegurar que el gráfico sea un círculo
 #segunda figura
 mediaVentCat = df_filteredI4[["Technology","Office Supplies","Furniture"]].mean().to_numpy()
 fig2, ax2 = plt.subplots()
 ax2.pie(mediaVentCat, labels=["Technology","Office Supplies","Furniture"], colors = colors,
-      autopct='%1.1f%%', startangle=140,textprops={'color':"white"})
+      autopct='%1.2f%%', startangle=140,textprops={'color':"white"})
 
 ax2.axis('equal')  # Para asegurar que el gráfico sea un círculo
 # Mostrar el gráfico en Streamlit
