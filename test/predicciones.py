@@ -1,13 +1,11 @@
 import numpy as np
-import streamlit as st
 #escalas
 from sklearn.preprocessing import StandardScaler
 #algoritmos 
-from sklearn.linear_model import LinearRegression
-from sklearn import datasets, linear_model
+from sklearn import  linear_model
 import keras
 from keras.src.models.sequential import Sequential
-from keras.src.layers import Dense
+from keras.src.layers import Dense, InputLayer
 import pandas as pd
 from statsmodels.tsa.api import ExponentialSmoothing #suavizado exponencial triple, que tiene en cuenta la estacionalidad
 import warnings
@@ -105,8 +103,9 @@ pdArray_concatenado2TrainEsc = scalerVentCat.fit_transform(pdArray_concatenado2T
 #predecimos los ingresos por categoría de 2019
 keras.utils.set_random_seed(1)
 def prediccionVentasCat():
-    modelRNVentCat2019 = Sequential()
-    modelRNVentCat2019.add(Dense(64, input_shape=(3,), activation='relu'))  # Capa oculta con 64 neuronas, tres entradas y función de activación ReLU
+    modelRNVentCat2019 = Sequential() 
+    modelRNVentCat2019.add(InputLayer(input_shape=(3,))) #capa de entrada
+    modelRNVentCat2019.add(Dense(64, activation='relu'))  # Capa oculta con 64 neuronas y función de activación ReLU
     modelRNVentCat2019.add(Dense(3))  # Capa de salida con una neurona (predicción de ingresos)
     modelRNVentCat2019.compile(optimizer='adam', loss='mse', metrics=['accuracy']) 
     modelRNVentCat2019.fit(UniCatTrainEsc, pdArray_concatenado2TrainEsc, epochs=100, batch_size=32, verbose = 0)

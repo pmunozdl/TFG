@@ -11,7 +11,7 @@ from sklearn import datasets, linear_model
 #from tensorflow.keras.models import Sequential
 
 from keras.src.models.sequential import Sequential
-from keras.src.layers import Dense
+from keras.src.layers import Dense, InputLayer
 import matplotlib.pyplot as plt
 import pandas as pd
 from statsmodels.tsa.api import ExponentialSmoothing #suavizado exponencial triple, que tiene en cuenta la estacionalidad
@@ -109,7 +109,8 @@ pdArray_concatenado2TrainEsc = scalerVentCat.fit_transform(pdArray_concatenado2T
 @st.cache_data()
 def prediccionVentCat2019():
     modelRNVentCat2019 = Sequential()
-    modelRNVentCat2019.add(Dense(64, input_shape=(3,), activation='relu'))  # Capa oculta con 64 neuronas, tres entradas y función de activación ReLU
+    modelRNVentCat2019.add(InputLayer(input_shape=(3,))) #capa de entrada
+    modelRNVentCat2019.add(Dense(64, activation='relu'))  # Capa oculta con 64 neuronas, tres entradas y función de activación ReLU
     modelRNVentCat2019.add(Dense(3))  # Capa de salida con una neurona (predicción de ingresos)
     modelRNVentCat2019.compile(optimizer='adam', loss='mse', metrics=['accuracy']) 
     modelRNVentCat2019.fit(UniCatTrainEsc, pdArray_concatenado2TrainEsc, epochs=100, batch_size=32)
@@ -202,7 +203,7 @@ max_amount = st.slider("Filtrar por importe de ventas máximo", min_value=(df_fi
 df_filteredI4 = df_filteredI3[df_filteredI3["Total"] <= max_amount].dropna()
 
 # Aplicar el filtro
-
+colors = ['red', 'lightblue', 'blue']
 st.header("Unidades vendidas por categoría")
 st.dataframe(df_filtered4[["Technology","Office Supplies","Furniture"]])
 
@@ -216,15 +217,16 @@ st.dataframe(df_filteredI4[["Technology","Office Supplies","Furniture"]])
 
 # Aplicar el filtro
 
-# Mostrar el DataFrame resultante
-
 
 # Grafico de barras
+st.write("Unidades vendidas totales")
 st.bar_chart(df_filtered4[["Technology","Office Supplies","Furniture"]])
+st.write("Ventas totales")
 st.bar_chart(df_filteredI4[["Technology","Office Supplies","Furniture"]])
 
+
 #gráfico circular
-colors = ['lightblue', 'green', 'red']
+
 mediaUnidadesCat = df_filtered4[["Technology","Office Supplies","Furniture"]].mean().to_numpy()
 fig1, ax = plt.subplots()
 ax.pie(mediaUnidadesCat, labels=["Technology","Office Supplies","Furniture"], colors = colors,autopct='%1.1f%%', startangle=140)
