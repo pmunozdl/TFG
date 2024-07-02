@@ -150,9 +150,31 @@ Pretende priorizar las mercancías de un almacén más importantes
 
 # Mostrar los DataFrames
 colMes1, colMes2 = st.columns(2)
-meses_disponibles = ['Todos'] + list(np.unique(UniCatFinal.index.month))
-meses_disponiblesI = ['Todos'] + list(np.unique(VentCatFinal.index.month))
+años_disponibles = ['Todos'] + list(np.unique(UniCatFinal.index.year))
+años_disponiblesI = ['Todos'] + list(np.unique(VentCatFinal.index.year))
+
 # Mostrar los gráficos en las columnas
+with colMes1: #reutilizamos las columnas anteriores
+    año_seleccionado = st.selectbox("Año filtro Unidad vendida", años_disponibles)
+
+with colMes2: #reutilizamos las columnas anteriores
+    año_seleccionadoI = st.selectbox("Año filtro Venta", años_disponiblesI)
+#filtrar por años las unidades vendidas
+if año_seleccionado != 'Todos':
+    df_filtered = UniCatFinal[UniCatFinal.index.year == año_seleccionado]
+else:
+    df_filtered = UniCatFinal
+#para filtrar por meses los ventas
+if año_seleccionadoI != 'Todos':
+    df_filteredI = VentCatFinal[VentCatFinal.index.year == año_seleccionadoI]
+else:
+    df_filteredI = VentCatFinal
+
+
+#a continuación, filtramos por el año
+meses_disponibles = ['Todos'] + list(np.unique(df_filtered.index.month))
+meses_disponiblesI = ['Todos'] + list(np.unique(df_filteredI.index.month))
+#mostrar los gráficos en columnas
 with colMes1:
     st.write("Unidades Vendidas")
     mes_seleccionado = st.selectbox("Mes filtro Unidades Vendidas", meses_disponibles)
@@ -161,34 +183,15 @@ with colMes2:
     mes_seleccionadoI = st.selectbox("Mes filtro Ventas", meses_disponiblesI)
 #para filtras por meses las unidades vendidas
 if mes_seleccionado != 'Todos':
-    df_filtered = UniCatFinal[UniCatFinal.index.month == mes_seleccionado]
-else:
-    df_filtered = UniCatFinal
-#para filtrar por meses los ventas
-if mes_seleccionadoI != 'Todos':
-    df_filteredI = VentCatFinal[VentCatFinal.index.month == mes_seleccionadoI]
-else:
-    df_filteredI = VentCatFinal
-
-#a continuación, filtramos por el año
-años_disponibles = ['Todos'] + list(np.unique(df_filtered.index.year))
-años_disponiblesI = ['Todos'] + list(np.unique(df_filteredI.index.year))
-
-with colMes1: #reutilizamos las columnas anteriores
-    año_seleccionado = st.selectbox("Año filtro Unidad vendida", años_disponibles)
-
-with colMes2: #reutilizamos las columnas anteriores
-    año_seleccionadoI = st.selectbox("Año filtro Venta", años_disponiblesI)
-#filtrar por años las unidades vendidas
-if año_seleccionado != 'Todos':
-    df_filtered2 = df_filtered[df_filtered.index.year == año_seleccionado]
+    df_filtered2 = df_filtered[df_filtered.index.month == mes_seleccionado]
 else:
     df_filtered2 = df_filtered
 #para filtrar por meses los ventas
-if año_seleccionadoI != 'Todos':
-    df_filteredI2 = df_filteredI[df_filteredI.index.year == año_seleccionadoI]
+if mes_seleccionadoI != 'Todos':
+    df_filteredI2 = df_filteredI[df_filteredI.index.month == mes_seleccionadoI]
 else:
     df_filteredI2 = df_filteredI
+
 
 # Filtro por valor mínimo de unidades vendidas
 min_sales = st.slider("Filtrar por unidades vendidas mínimas", min_value=(df_filtered2["Total"].min()+1), max_value=(df_filtered2["Total"].max()-1), value=df_filtered2["Total"].min())
@@ -253,6 +256,6 @@ with col2:
 
 ###añadir gráfico de columnas de los 5 años. 
 st.write("Unidades vendidas totales")
-st.line_chart(df_filtered2[["Total"]])
+st.line_chart(df_filtered[["Total"]])
 st.write("Ventas totales")
-st.line_chart(df_filteredI2[["Total"]])
+st.line_chart(df_filteredI[["Total"]])
