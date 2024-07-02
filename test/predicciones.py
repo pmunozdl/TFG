@@ -3,6 +3,8 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 #algoritmos 
 from sklearn import  linear_model
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import keras
 from keras.src.models.sequential import Sequential
 from keras.src.layers import Dense, InputLayer

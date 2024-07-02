@@ -204,7 +204,7 @@ max_amount = st.slider("Filtrar por importe de ventas máximo", min_value=(df_fi
 df_filteredI4 = df_filteredI3[df_filteredI3["Total"] <= max_amount].dropna()
 
 # Aplicar el filtro
-colors = ['red', 'blue', 'lightblue']
+colors = ['red', 'lightblue', 'blue']
 st.header("Unidades vendidas por categoría")
 st.dataframe(df_filtered4[["Technology","Office Supplies","Furniture"]])
 
@@ -230,13 +230,13 @@ st.bar_chart(df_filteredI4[["Technology","Office Supplies","Furniture"]])
 
 mediaUnidadesCat = df_filtered4[["Technology","Office Supplies","Furniture"]].mean().to_numpy()
 fig1, ax = plt.subplots()
-ax.pie(mediaUnidadesCat, labels=["Technology","Office Supplies","Furniture"], colors = colors,autopct='%1.2f%%', startangle=140,textprops={'color':"white"})
+ax.pie(mediaUnidadesCat, labels=["Technology","Office Supplies","Furniture"], colors = colors,autopct='%1.2f%%', startangle=140)
 ax.axis('equal')  # Para asegurar que el gráfico sea un círculo
 #segunda figura
 mediaVentCat = df_filteredI4[["Technology","Office Supplies","Furniture"]].mean().to_numpy()
 fig2, ax2 = plt.subplots()
 ax2.pie(mediaVentCat, labels=["Technology","Office Supplies","Furniture"], colors = colors,
-      autopct='%1.2f%%', startangle=140,textprops={'color':"white"})
+      autopct='%1.2f%%', startangle=140)
 
 ax2.axis('equal')  # Para asegurar que el gráfico sea un círculo
 # Mostrar el gráfico en Streamlit
