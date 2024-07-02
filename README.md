@@ -61,6 +61,7 @@ Para ejecutar el proyecto, el único requisito es disponer de un gestor de paque
     ```
 
 7. Acceder a Jupyter Notebook
+
     7.1. Acceder a la terminal
     ```bash
     docker exec -it <nombre_contenedor> /bin/bash   
@@ -74,6 +75,7 @@ Para ejecutar el proyecto, el único requisito es disponer de un gestor de paque
     http://localhost:8888   
     ```
 8. Ejecutar los test
+
     8.1. Acceder a la terminal
     ```bash
     docker exec -it <nombre_contenedor> /bin/bash   
