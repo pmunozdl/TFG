@@ -22,7 +22,7 @@ En cada una de las ventanas se incluyen elementos visuales, como gráficos e ind
 ## Composición del proyecto
 A continuación, se listan los ficheros que componen el proyecto junto a una breve explicación de estos:
 
-    - **Cuadro de Mando/Nuevo Cuadro de mando.pbix:** Cuadro de mando resultante del análisis de la actividad de la empresa. 
+    - **Cuadro de Mando/Nuevo Cuadro de mando.pbix:** Cuadro de mando en formato de Power BI resultante del análisis de la actividad de la empresa. 
 
     - **Dataset/VentasEcommerce.xslx:** Conjunto de datos de la actividad de la empresa empleada como base para realizar el análisis. 
 
